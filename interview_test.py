@@ -261,27 +261,25 @@ def get_value(data, key, default, lookup=None, mapper=None):
     return_value = data[key] # will error if key does not exist in data
     if return_value is None or return_value == "":
         return_value = default
-      
+    # this next section will error in case that return value is not in lookup enum
     if lookup:
-        return_value = lookup[return_value]
-      
+        return_value = lookup[return_value] # if wanting enum value returned this is incorrect see suggested code
+    # this next section may error depending on the map function action if param is not type defined 
     if mapper:
         return_value = mapper(return_value)
       
     return return_value
 
     ##### suggested code:
-    # # this next section will error in case that key is not in dictionary
-    # return_value = default # set value to default initially 
     # if key in data: # check if key exists in dictionary then set to dict[key]
     #     return_value = data[key]
-    # # this next section will error in case that return value is not in lookup enum
+    # 
     # if lookup:
     #     try:
     #         return_value = lookup[return_value].value # in the case of lookup enum current line would not return its enum value 
     #     except:
     #         print(return_value +' not in lookup enum')
-    # # this next section may error depending on the map function action if param is not type defined 
+    # 
     # if mapper:
     #     return_value = mapper(return_value)
     # return return_value
@@ -317,7 +315,7 @@ def config_from_dict(dict):
     DAG name
     and whose second element is a dict describing the DAG's properties
     """
-    namespace = dict['Namespace'] # why specify this early 
+    namespace = dict['Namespace']
     return (dict['Airflow DAG'],
             {"earliest_available_delta_days": 0,
              "lif_encoding": 'json',
@@ -327,7 +325,7 @@ def config_from_dict(dict):
                  get_value(dict, 'Available End Time', '08:00'),
              "require_schema_match":
                  get_value(dict, 'Requires Schema Match', 'True',
-                           mapper=string_to_bool),
+                           mapper=string_to_bool), # may need type defining if none default response cannot assumed to be string
              "schedule_interval":
                  get_value(dict, 'Schedule', '1 7 * * * '),
              "delta_days":
