@@ -38,9 +38,9 @@ async def startup_event():
     create_tables()
     
     # Create default categories if they don't exist
-    db_gen = get_db()
+    db_gen = get_db() 
     db = next(db_gen)
-    try:
+    try: # make sure db session closing properly
         categorization_service = CategorizationService(db)
         categorization_service.create_default_categories()
     finally:
@@ -94,7 +94,7 @@ async def upload_csv(file: UploadFile = File(...), db: Session = Depends(get_db)
         # except Exception as e:
         #     continue  # Skip invalid rows
         except Exception as e:
-            logging.warning(f"Skipping row due to error: {e}")
+            logging.warning(f"Skipping row due to error: {e}") # add logging instead of just continue
             continue
     
     db.commit()
@@ -114,7 +114,7 @@ async def get_transactions(
     """Get all transactions with optional filtering."""
     query = db.query(Transaction)
     
-    if category_id is not None:
+    if category_id is not None: # None check
         query = query.filter(Transaction.category_id == category_id)
     
     transactions = query.offset(skip).limit(limit).all()
