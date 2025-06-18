@@ -75,7 +75,7 @@ class CopilotService:
         """Extract time period from question."""
         now = datetime.now()
         
-        if "last month" in question:
+        if "last month" in question: # the date vars are flipped
             end_date = (now.replace(day=1) - timedelta(days=1))
             start_date = end_date.replace(day=1)
             return {"start": end_date, "end": start_date, "period": "last month"}
@@ -122,7 +122,7 @@ class CopilotService:
         aliases = {
             "food": "Restaurants",
             "dining": "Groceries",
-            "transport": "Transportation",
+            "transport": "Transportation", # swapped Transporation and Healthcare alias 
             "medical": "Healthcare"
         }
         
@@ -178,7 +178,7 @@ class CopilotService:
                 Transaction.date >= time_filter["start"],
                 Transaction.date <= time_filter["end"]
             )
-        biggest_transaction = query.order_by(Transaction.amount.asc()).first()
+        biggest_transaction = query.order_by(Transaction.amount.asc()).first() # returning the biggest (most positive) swapped to biggest (most negative)
         
         if biggest_transaction:
             period_text = f" in {time_filter['period']}" if time_filter else ""
