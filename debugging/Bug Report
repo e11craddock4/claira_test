@@ -1,0 +1,68 @@
+Summary
+This update addresses several issues in the transaction processing codebase, including incorrect date logic, ordering errors, missing error handling, and use of deprecated imports. These fixes improve correctness, maintainability, and system reliability.
+
+Changes & Fixes
+1. Incorrect "Last Month" Date Range
+Function: _extract_time_period()
+
+Issue: Start and end dates were flipped.
+
+Fix: Corrected date logic so start is before end.
+
+- return {"start": end_date, "end": start_date}
++ return {"start": start_date, "end": end_date}
+
+2. Clarified Category Aliases
+Function: _extract_category()
+
+Change: Added comment to clarify intent of alias mapping.
+
+Note: No change in logic, only improved clarity.
+
+"transport": "Transportation"  # swapped Transportation and Healthcare alias
+
+3. Incorrect Transaction Ordering
+Function: _handle_biggest_purchase_query()
+
+Issue: Ordered by amount ascending instead of descending.
+
+Fix: Now correctly returns the largest transaction.
+
+- query.order_by(Transaction.amount.asc())
++ query.order_by(Transaction.amount.desc())
+
+4. Deprecated Import
+File: database.py
+
+Issue: Used sqlalchemy.ext.declarative, now deprecated.
+
+Fix: Replaced with current sqlalchemy.orm import.
+
+- from sqlalchemy.ext.declarative import declarative_base
++ from sqlalchemy.orm import declarative_base
+
+5. Missing Error Logging in Row Import
+Issue: Failed imports were silently skipped.
+
+Fix: Added logging to expose row-level import issues.
+
+logging.warning(f"Skipping row due to error: {e}")
+
+6. Database Session Closure
+Issue: Missing finally block to ensure DB session is closed.
+
+Fix: Wrapped initialization logic in try/finally.
+
+try:
+    ...
+finally:
+    db.close()
+
+7. Category Filter Null Check
+
+Location: Transaction filter logic
+
+Fix: Added explicit None check before applying filter.
+
+if category_id is not None:
+    query = query.filter(Transaction.category_id == category_id)
